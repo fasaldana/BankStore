@@ -21,7 +21,8 @@
     "react-hook-form": "^7.54.2",
     "react-native": "0.76.7",
     "react-redux": "^9.2.0",
-    "redux": "^5.0.1"
+    "redux": "^5.0.1",
+    "redux-thunk": "^3.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
