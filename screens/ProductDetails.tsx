@@ -19,14 +19,30 @@ const ProductDetails: React.FC<ProductDetailScreenProps> = ({ route }) => {
     <View style={styles.container}>
       <Text style={styles.infoHeader}>ID: {product.id}</Text>
       <Text>Información Extra</Text>
-      <Text style={styles.name}>Nombre: {product.name}</Text>
-      <Text style={styles.description}>Descripción {product.description}</Text>
-      <Text>Logo</Text>
-      <Image source={{ uri: product.logo }} style={styles.logo} />
-      <Text style={styles.date}>
-        Fecha de liberación: {product.date_release}
-      </Text>
-      <Text style={styles.date}>Fecha revisión: {product.date_revision}</Text>
+      <View style={styles.textContainer}>
+        <View style={styles.inLineData}>
+          <Text style={styles.title}>Nombre</Text>
+          <Text style={styles.description}>{product.name}</Text>
+        </View>
+        <View style={styles.inLineData}>
+          <Text style={styles.title}>Descripción</Text>
+          <Text style={styles.description}>{product.description}</Text>
+        </View>
+        <Text style={styles.title}>Logo</Text>
+        <Image
+          source={{ uri: product.logo }}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <View style={styles.inLineData}>
+          <Text style={styles.title}>Fecha liberación</Text>
+          <Text style={styles.description}>{product.date_release}</Text>
+        </View>
+        <View style={styles.inLineData}>
+          <Text style={styles.title}>Fecha revisión</Text>
+          <Text style={styles.description}>{product.date_revision}</Text>
+        </View>
+      </View>
     </View>
   );
 };
@@ -42,22 +58,30 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 20,
+    width: 200,
+    height: 200,
+    alignSelf: "center",
   },
-  name: {
-    fontSize: 15,
-    marginBottom: 10,
+  textContainer: {
+    marginTop: 20,
+    padding: 15,
+  },
+  inLineData: {
+    flexDirection: "row",
     justifyContent: "space-between",
+    marginBottom: 10,
+    flexWrap: "wrap",
+  },
+  title: {
+    fontSize: 18,
   },
   description: {
-    fontSize: 15,
-    marginBottom: 10,
-  },
-  date: {
-    fontSize: 14,
-    color: "#666",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 20,
+    flex: 2,
+    alignSelf: "flex-end",
+    textAlign: "right",
   },
 });
 
