@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, StyleSheet, TouchableOpacity } from "react-native";
 
 type CustomButtonProps = {
   text: string;
@@ -27,7 +27,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
 const styles = StyleSheet.create({
   button: {
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 2,
     alignItems: "center",
     justifyContent: "center",
     marginVertical: 10,
