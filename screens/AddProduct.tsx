@@ -12,7 +12,7 @@ import { useForm, Controller } from "react-hook-form";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import CustomButton from "../components/CustomButton";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../redux/Store";
+import { AppDispatch, RootState } from "../redux/Store";
 import { addProduct, updateProduct } from "../redux/product/ProductSlice";
 import { Product } from "../types/Product";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
@@ -35,7 +35,7 @@ type FormData = {
 const AddProduct: React.FC<AddProductProps> = ({ navigation, route }) => {
   const { product, isEdit } = route.params || {};
   const errorText = "Este campo es requerido!";
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { loading, error } = useSelector((state: RootState) => state.products);
   const {
     control,
@@ -90,14 +90,26 @@ const AddProduct: React.FC<AddProductProps> = ({ navigation, route }) => {
   const onSubmit = async (data: Product) => {
     try {
       if (isEdit) {
-        await dispatch<any>(updateProduct(data)).unwrap();
-        navigation.navigate("ProductList", {
-          successMessage: "Actualizado de forma correcta!",
+        await dispatch(updateProduct(data)).unwrap();
+        navigation.reset({
+          index: 0,
+          routes: [
+            {
+              name: "ProductList",
+              params: { successMessage: "Producto actualizado correctamente!" },
+            },
+          ],
         });
       } else {
-        await dispatch<any>(addProduct(data)).unwrap();
-        navigation.navigate("ProductList", {
-          successMessage: "Agregado de forma correcta!",
+        await dispatch(addProduct(data)).unwrap();
+        navigation.reset({
+          index: 0,
+          routes: [
+            {
+              name: "ProductList",
+              params: { successMessage: "Producto agregado correctamente!" },
+            },
+          ],
         });
       }
       reset();
@@ -183,8 +195,8 @@ const AddProduct: React.FC<AddProductProps> = ({ navigation, route }) => {
           rules={{
             required: errorText,
             minLength: {
-              value: 5,
-              message: "Descripción debe tener al menos 5 caracteres",
+              value: 10,
+              message: "Descripción debe tener al menos 10 caracteres",
             },
             maxLength: {
               value: 200,
