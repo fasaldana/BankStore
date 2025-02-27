@@ -7,53 +7,47 @@ import {
   TouchableOpacity,
   StyleSheet,
   TextInput,
-  Button,
 } from "react-native";
-import { fetchProducts } from "../api/Product";
-import { NavigationProp } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import { loadProducts } from "../redux/product/ProductSlice";
+import { RootState } from "../redux/Store";
+import { NavigationProp, RouteProp } from "@react-navigation/native";
 import { RootStackParamList, Product } from "../types/Product";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import CustomButton from "../components/CustomButton";
+import { AppDispatch } from "../redux/Store";
 
 type ProductsListProps = {
   navigation: NavigationProp<RootStackParamList, "ProductList">;
+  route: RouteProp<RootStackParamList, "ProductList">;
 };
 
-const ProductsList: React.FC<ProductsListProps> = ({ navigation }) => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const ProductsList: React.FC<ProductsListProps> = ({ navigation, route }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { products, loading, error } = useSelector(
+    (state: RootState) => state.products
+  );
   const [searchQuery, setSearchQuery] = useState("");
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        const response = await fetchProducts();
-        setProducts(response.data);
-        setFilteredProducts(response.data);
-      } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError("An unknown error occurred");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProducts();
-  }, []);
+    dispatch(loadProducts());
+  }, [dispatch]);
 
   useEffect(() => {
-    const filtered = products.filter(
+    if (route.params?.successMessage) {
+      setSuccessMessage(route.params.successMessage);
+      setTimeout(() => setSuccessMessage(null), 3000);
+    }
+  }, [route.params?.successMessage]);
+
+  const filteredProducts =
+    products?.filter(
       (product) =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.id.toString().includes(searchQuery)
-    );
-    setFilteredProducts(filtered);
-  }, [searchQuery, products]);
+    ) || [];
 
   if (loading) {
     return (
@@ -84,6 +78,11 @@ const ProductsList: React.FC<ProductsListProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      {successMessage && (
+        <View style={styles.successContainer}>
+          <Text style={styles.successText}>{successMessage}</Text>
+        </View>
+      )}
       <TextInput
         style={styles.searchBar}
         placeholder="Search..."
@@ -96,6 +95,11 @@ const ProductsList: React.FC<ProductsListProps> = ({ navigation }) => {
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContainer}
       />
+      <CustomButton
+        text="Agregar"
+        textColor="#0f265c"
+        backgroundColor="#ffdd00"
+        onPress={() => navigation.navigate("AddProduct")}
       />
     </SafeAreaView>
   );
@@ -104,11 +108,11 @@ const ProductsList: React.FC<ProductsListProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F8F8",
+    backgroundColor: "#FFF",
     padding: 20,
   },
   searchBar: {
-    height: 40,
+    height: 50,
     backgroundColor: "#FFF",
     borderRadius: 8,
     paddingHorizontal: 10,
@@ -126,13 +130,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#FFF",
     padding: 15,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    borderBottomWidth: 1,
+    borderBottomColor: "#CCC",
   },
   itemTitle: {
     fontSize: 16,
@@ -155,6 +155,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  successContainer: {
+    backgroundColor: "#d4edda",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 20,
+  },
+  successText: {
+    color: "#155724",
+    fontSize: 16,
   },
 });
 
