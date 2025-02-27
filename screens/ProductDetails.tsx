@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
-import { RouteProp } from "@react-navigation/native";
+import { NavigationProp, RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../types/Product";
+import CustomButton from "../components/CustomButton";
 
 type ProductDetailScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -10,9 +11,14 @@ type ProductDetailScreenRouteProp = RouteProp<
 
 type ProductDetailScreenProps = {
   route: ProductDetailScreenRouteProp;
+  navigation: NavigationProp<RootStackParamList, "ProductDetail">;
 };
 
-const ProductDetails: React.FC<ProductDetailScreenProps> = ({ route }) => {
+const ProductDetails: React.FC<ProductDetailScreenProps> = ({
+  route,
+  navigation,
+}) => {
+  const [modalVisible, setModalVisible] = useState(false);
   const { product } = route.params;
 
   return (
@@ -43,6 +49,20 @@ const ProductDetails: React.FC<ProductDetailScreenProps> = ({ route }) => {
           <Text style={styles.description}>{product.date_revision}</Text>
         </View>
       </View>
+      <CustomButton
+        backgroundColor="#ccc"
+        text="Editar"
+        textColor="#0f265c"
+        onPress={() =>
+          navigation.navigate("AddProduct", { product, isEdit: true })
+        }
+      />
+      <CustomButton
+        backgroundColor="#dc3545"
+        text="Eliminar"
+        textColor="#fff"
+        onPress={() => setModalVisible(true)}
+      />
     </View>
   );
 };
@@ -58,8 +78,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   logo: {
-    width: 200,
-    height: 200,
+    width: 180,
+    height: 180,
     alignSelf: "center",
   },
   textContainer: {
@@ -73,10 +93,10 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   title: {
-    fontSize: 18,
+    fontSize: 14,
   },
   description: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
     marginBottom: 20,
     flex: 2,
