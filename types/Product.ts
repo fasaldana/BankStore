@@ -8,6 +8,7 @@ export type Product = {
 };
 
 export type RootStackParamList = {
-  ProductList: undefined;
+  ProductList: { successMessage: string } | undefined;
   ProductDetail: { product: Product };
+  AddProduct: undefined;
 };
