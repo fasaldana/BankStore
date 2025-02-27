@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../types/Product";
 import CustomButton from "../components/CustomButton";
+import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
+import { useProductDelete } from "../hooks/useProductDelete";
 
 type ProductDetailScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -18,8 +20,9 @@ const ProductDetails: React.FC<ProductDetailScreenProps> = ({
   route,
   navigation,
 }) => {
-  const [modalVisible, setModalVisible] = useState(false);
   const { product } = route.params;
+  const { modalVisible, setModalVisible, handleDelete, handleCancel } =
+    useProductDelete(product.id, navigation);
 
   return (
     <View style={styles.container}>
@@ -62,6 +65,13 @@ const ProductDetails: React.FC<ProductDetailScreenProps> = ({
         text="Eliminar"
         textColor="#fff"
         onPress={() => setModalVisible(true)}
+      />
+      <DeleteConfirmationModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onConfirm={handleDelete}
+        onCancel={handleCancel}
+        productName={product.name}
       />
     </View>
   );

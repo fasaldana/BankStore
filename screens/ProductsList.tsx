@@ -8,15 +8,12 @@ import {
   StyleSheet,
   TextInput,
 } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { loadProducts } from "../redux/product/ProductSlice";
-import { RootState } from "../redux/Store";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
 import { RootStackParamList, Product } from "../types/Product";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import CustomButton from "../components/CustomButton";
-import { AppDispatch } from "../redux/Store";
+import { useProducts } from "../hooks/useProducts";
 
 type ProductsListProps = {
   navigation: NavigationProp<RootStackParamList, "ProductList">;
@@ -24,16 +21,9 @@ type ProductsListProps = {
 };
 
 const ProductsList: React.FC<ProductsListProps> = ({ navigation, route }) => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { products, loading, error } = useSelector(
-    (state: RootState) => state.products
-  );
-  const [searchQuery, setSearchQuery] = useState("");
+  const { filteredProducts, loading, error, searchQuery, setSearchQuery } =
+    useProducts();
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    dispatch(loadProducts());
-  }, [dispatch]);
 
   useEffect(() => {
     if (route.params?.successMessage) {
@@ -42,12 +32,11 @@ const ProductsList: React.FC<ProductsListProps> = ({ navigation, route }) => {
     }
   }, [route.params?.successMessage]);
 
-  const filteredProducts =
-    products?.filter(
-      (product) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.id.toString().includes(searchQuery)
-    ) || [];
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => null,
+    });
+  }, [navigation]);
 
   if (loading) {
     return (
@@ -78,17 +67,17 @@ const ProductsList: React.FC<ProductsListProps> = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {successMessage && (
-        <View style={styles.successContainer}>
-          <Text style={styles.successText}>{successMessage}</Text>
-        </View>
-      )}
       <TextInput
         style={styles.searchBar}
         placeholder="Search..."
         value={searchQuery}
         onChangeText={setSearchQuery}
       />
+      {successMessage && (
+        <View style={styles.successContainer}>
+          <Text style={styles.successText}>{successMessage}</Text>
+        </View>
+      )}
       <FlatList
         data={filteredProducts}
         renderItem={renderItem}

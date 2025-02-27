@@ -72,6 +72,26 @@ export const updateProduct = async (
   }
 };
 
+export const deleteProduct = async (id: string) => {
+  try {
+    const response = await axios.delete(`${API_URL}/${id}`);
+    if (response.status === 200) {
+      return "Product removed successfully";
+    } else {
+      throw new Error("Product not found");
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      throw new Error("Product not found");
+    }
+    if (error instanceof Error) {
+      throw new Error("Error deleting product: " + error.message);
+    } else {
+      throw new Error("Error deleting product");
+    }
+  }
+};
+
 export const checkProductIdExists = async (id: string) => {
   try {
     const response = await axios.get(`${API_URL}/${id}`);
