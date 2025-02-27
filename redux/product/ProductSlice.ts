@@ -3,6 +3,7 @@ import {
   fetchProducts,
   createProduct as apiCreateProduct,
   updateProduct as apiUpdateProduct,
+  deleteProduct as apiDeleteProduct,
   checkProductIdExists,
 } from "../../api/Product";
 import { Product } from "../../types/Product";
@@ -47,6 +48,18 @@ export const updateProduct = createAsyncThunk(
       return product;
     } catch (error) {
       return rejectWithValue("Failed to update product");
+    }
+  }
+);
+
+export const deleteProduct = createAsyncThunk(
+  "products/deleteProduct",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      await apiDeleteProduct(id);
+      return id;
+    } catch (error) {
+      return rejectWithValue("Failed to delete product");
     }
   }
 );
@@ -97,6 +110,20 @@ const productSlice = createSlice({
         }
       })
       .addCase(updateProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(deleteProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.products = state.products.filter(
+          (product) => product.id !== action.payload
+        );
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
