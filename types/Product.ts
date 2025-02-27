@@ -10,5 +10,5 @@ export type Product = {
 export type RootStackParamList = {
   ProductList: { successMessage: string } | undefined;
   ProductDetail: { product: Product };
-  AddProduct: undefined;
+  AddProduct: { isEdit: boolean; product: Product } | undefined;
 };

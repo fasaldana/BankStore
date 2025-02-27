@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   fetchProducts,
   createProduct as apiCreateProduct,
+  updateProduct as apiUpdateProduct,
   checkProductIdExists,
 } from "../../api/Product";
 import { Product } from "../../types/Product";
@@ -38,6 +39,18 @@ export const addProduct = createAsyncThunk(
   }
 );
 
+export const updateProduct = createAsyncThunk(
+  "products/updateProduct",
+  async (product: Product, { rejectWithValue }) => {
+    try {
+      await apiUpdateProduct(product.id, product);
+      return product;
+    } catch (error) {
+      return rejectWithValue("Failed to update product");
+    }
+  }
+);
+
 const productSlice = createSlice({
   name: "products",
   initialState,
@@ -67,6 +80,23 @@ const productSlice = createSlice({
           : state.products;
       })
       .addCase(addProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(updateProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.products.findIndex(
+          (product) => product.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.products[index] = action.payload;
+        }
+      })
+      .addCase(updateProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

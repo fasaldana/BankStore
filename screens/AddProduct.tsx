@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,12 +13,14 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import CustomButton from "../components/CustomButton";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/Store";
-import { addProduct } from "../redux/product/ProductSlice";
-import { Product, RootStackParamList } from "../types/Product";
-import { NavigationProp } from "@react-navigation/native";
+import { addProduct, updateProduct } from "../redux/product/ProductSlice";
+import { Product } from "../types/Product";
+import { NavigationProp, RouteProp } from "@react-navigation/native";
+import { RootStackParamList } from "../types/Product";
 
 type AddProductProps = {
   navigation: NavigationProp<RootStackParamList, "AddProduct">;
+  route: RouteProp<RootStackParamList, "AddProduct">;
 };
 
 type FormData = {
@@ -30,7 +32,8 @@ type FormData = {
   date_revision: string;
 };
 
-const AddProduct: React.FC<AddProductProps> = ({ navigation }) => {
+const AddProduct: React.FC<AddProductProps> = ({ navigation, route }) => {
+  const { product, isEdit } = route.params || {};
   const errorText = "Este campo es requerido!";
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state: RootState) => state.products);
@@ -46,6 +49,17 @@ const AddProduct: React.FC<AddProductProps> = ({ navigation }) => {
   const [showDatePicker, setShowDatePicker] = useState<
     "release" | "revision" | null
   >(null);
+
+  useEffect(() => {
+    if (isEdit && product) {
+      setValue("id", product.id);
+      setValue("name", product.name);
+      setValue("description", product.description);
+      setValue("logo", product.logo);
+      setValue("date_release", product.date_release);
+      setValue("date_revision", product.date_revision);
+    }
+  }, [isEdit, product, setValue]);
 
   const formatDate = (date: Date) => {
     const day = String(date.getDate()).padStart(2, "0");
@@ -75,11 +89,18 @@ const AddProduct: React.FC<AddProductProps> = ({ navigation }) => {
 
   const onSubmit = async (data: Product) => {
     try {
-      await dispatch<any>(addProduct(data)).unwrap();
+      if (isEdit) {
+        await dispatch<any>(updateProduct(data)).unwrap();
+        navigation.navigate("ProductList", {
+          successMessage: "Actualizado de forma correcta!",
+        });
+      } else {
+        await dispatch<any>(addProduct(data)).unwrap();
+        navigation.navigate("ProductList", {
+          successMessage: "Agregado de forma correcta!",
+        });
+      }
       reset();
-      navigation.navigate("ProductList", {
-        successMessage: "Agregado de forma correcta!",
-      });
     } catch (error) {
       setError("id", {
         type: "manual",
@@ -113,10 +134,15 @@ const AddProduct: React.FC<AddProductProps> = ({ navigation }) => {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={[styles.input, errors.id && styles.errorInput]}
+              style={[
+                styles.input,
+                isEdit && styles.disabled,
+                errors.id && styles.errorInput,
+              ]}
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
+              editable={!isEdit}
             />
           )}
           name="id"
@@ -212,7 +238,7 @@ const AddProduct: React.FC<AddProductProps> = ({ navigation }) => {
               />
               {showDatePicker === "release" && (
                 <DateTimePicker
-                  value={new Date()}
+                  value={value ? new Date(value) : new Date()}
                   mode="date"
                   display={Platform.OS === "ios" ? "spinner" : "default"}
                   onChange={(event, selectedDate) =>
@@ -259,12 +285,14 @@ const AddProduct: React.FC<AddProductProps> = ({ navigation }) => {
             text="Enviar"
             onPress={handleSubmit(onSubmit)}
           />
-          <CustomButton
-            backgroundColor="#ccc"
-            textColor="#0f265c"
-            text="Reiniciar"
-            onPress={() => reset()}
-          />
+          {!isEdit && (
+            <CustomButton
+              backgroundColor="#ccc"
+              textColor="#0f265c"
+              text="Reiniciar"
+              onPress={() => reset()}
+            />
+          )}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

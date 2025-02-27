@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Product } from "../types/Product";
 
-const API_URL = "http://192.168.1.26:3002/bp/products";
+const API_URL = "http://localhost:3002/bp/products";
 
 export const fetchProducts = async (): Promise<Product[]> => {
   try {
@@ -40,6 +40,34 @@ export const createProduct = async (product: {
       throw new Error("Error creating product: " + error.message);
     } else {
       throw new Error("Error creating product");
+    }
+  }
+};
+
+export const updateProduct = async (
+  id: string,
+  product: {
+    name: string;
+    description: string;
+    logo: string;
+    date_release: string;
+    date_revision: string;
+  }
+) => {
+  try {
+    const response = await axios.put(`${API_URL}/${id}`, {
+      name: product.name,
+      description: product.description,
+      logo: product.logo,
+      date_release: product.date_release,
+      date_revision: product.date_revision,
+    });
+    return response.data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error("Error updating product: " + error.message);
+    } else {
+      throw new Error("Error updating product");
     }
   }
 };

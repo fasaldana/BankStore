@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 const CustomHeader: React.FC = () => {
   return (
     <View style={styles.container}>
-      <Ionicons name="home" size={24} color="black" />
+      <Ionicons name="home" size={22} color="black" />
       <Text style={styles.title}>BANCO</Text>
     </View>
   );
