@@ -60,21 +60,3 @@ Ejemplo:
 ```sh
 http://192.168.x.x:3002
 ```
-
-## 📷 Capturas de pantalla
-
-_Aquí puedes agregar imágenes de la app en funcionamiento._
-
-## ✨ Contribución
-
-Si deseas mejorar esta aplicación, ¡tus contribuciones son bienvenidas! 
-
-1. Haz un fork del repositorio  
-2. Crea una rama con tus cambios: `git checkout -b feature-nueva-funcionalidad`  
-3. Realiza un commit: `git commit -m "Agregada nueva funcionalidad"`  
-4. Haz push a la rama: `git push origin feature-nueva-funcionalidad`  
-5. Abre un **Pull Request**  
-
-## 📄 Licencia
-
-Este proyecto está bajo la licencia **MIT**.
