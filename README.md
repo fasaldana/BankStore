@@ -45,18 +45,20 @@ Asegúrate de tener **Node.js** y **Expo CLI** instalados en tu sistema.
 ✅ Eliminar productos  
 ✅ Gestión de estado con Redux  
 
-## 🧪 Pruebas
+## 🧪 consideraciones
 
-Ejecuta los tests unitarios con:
+En el archivo api/product.ts se debe configurar la url del host para hacer pruebas locales en dispositivos móviles.
 
+reemplazar
 ```sh
-npm test
+http://localhost:3002
 ```
+por el ip del dispositivo.
 
-Para ver el **coverage** de los tests:
+Ejemplo:
 
 ```sh
-npm test -- --coverage
+http://192.168.x.x:3002
 ```
 
 ## 📷 Capturas de pantalla
